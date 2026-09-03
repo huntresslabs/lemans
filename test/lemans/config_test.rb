@@ -209,6 +209,31 @@ class ConfigTest < Minitest::Test
     end
   end
 
+  def test_a_bench_loaded_from_a_relative_path_hands_absolute_paths_down_to_its_tasks
+    Dir.mktmpdir do |dir|
+      root = Pathname(dir)
+      root.join("environment").mkpath
+      root.join("environment/Dockerfile").write("FROM scratch\n")
+      root.join("verification").mkpath
+      root.join("verification/verify").write("exit 0\n")
+      root.join("bench.yml").write("version: 1\n")
+      task = root.join("tasks/heavy")
+      task.join("tests").mkpath
+      task.join("tests/test.sh").write("exit 0\n")
+      task.join("instruction.md").write("Go.\n")
+      task.join("bench.yml").write("agent: { cost_limit: 0.01 }\n")
+
+      config = Dir.chdir(dir) { Lemans::Config.load_file(".") }
+      heavy = config.tasks.fetch(0)
+      real = root.realpath
+
+      assert_in_delta 0.01, heavy.config.agent.cost_limit
+      assert_equal real.join("environment/Dockerfile"), heavy.config.environment.dockerfile
+      assert_equal real.join("verification"), heavy.verifier.verification
+      assert_equal [ "verify" ], heavy.verifier.files.map(&:last)
+    end
+  end
+
   def test_a_task_bench_yml_tunes_the_bench_for_that_task
     Dir.mktmpdir do |dir|
       root = Pathname(dir)

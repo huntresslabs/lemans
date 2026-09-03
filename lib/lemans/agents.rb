@@ -8,7 +8,8 @@ module Lemans
       "nop" => "Nop",
       "oracle" => "Oracle",
       "miniswen" => "Miniswen",
-      "miniswen-installed" => "MiniswenInstalled"
+      "miniswen-installed" => "MiniswenInstalled",
+      "claude-code" => "Harnesses::ClaudeCode"
     }.freeze
 
     def self.build(name, profile:, model: nil)
