@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [1.3.2] - 2026-09-08
+
 - Miniswen: increase provider error max retry window to ~1 min.
 - Collect patches on agent errors.
 
